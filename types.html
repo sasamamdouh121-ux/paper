@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>اختر المقاس</title>
+    <style>
+        body { background-color: rgb(0, 13, 17); color: white; font-family: sans-serif; text-align: center; }
+        .tools { list-style: none; padding: 50px 0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .tools a { display: inline-block; padding: 15px 40px; border: 2px solid #071f29; color: #3affaa; text-decoration: none; border-radius: 50px; font-size: 24px; font-weight: bold; cursor: pointer; }
+        .tools a:hover { background: #3affaa; color: black; }
+    </style>
+</head>
+<body>
+    <h2 id="msg">حدد المقاس لـ: </h2>
+    <ul class="tools">
+  
+        <li><a onclick="finish('نص فرخ')">نص فرخ</a></li>
+        <li><a onclick="finish('ربع فرخ')">ربع فرخ</a></li>
+        <li><a onclick="finish('A3')">A3</a></li>
+        <li><a onclick="finish('A4')">A4</a></li>
+    </ul>
+
+    <script>
+        const t = localStorage.getItem('temp_type');
+        document.getElementById('msg').innerText += t;
+
+        function finish(size) {
+            const qty = localStorage.getItem('temp_qty');
+            let cart = JSON.parse(localStorage.getItem('userCart')) || [];
+            
+            cart.push({ type: t, size: size, qty: qty });
+            localStorage.setItem('userCart', JSON.stringify(cart));
+            
+            alert("تمت الإضافة للسلة بنجاح!");
+            window.location.href = 'index.html'; // يرجعه يطلب تاني
+        }
+    </script>
+</body>
+</html>

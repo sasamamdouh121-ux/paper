@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>متجر الورق - الرئيسية</title>
+    <style>
+        .whatsapp{width: 50px; height: 50px;}
+        body { background-color: rgb(0, 13, 17); color: white; font-family: sans-serif; text-align: center; margin: 0; }
+        .nav { padding: 20px; background: #061e3f; }
+        .nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
+        .welcome { margin-top: 100px; }
+        .btn-order {   display: inline-block; padding: 20px 50px; border: 2px solid #033646; color: #032730; text-decoration: none; border-radius: 50px; font-size: 24px; font-weight: bold; transition: 0.3s; }
+        .btn-order:hover { background: #033646; color: white; }
+        .c:hover{background: #ff0000; color: black;}
+        .c{display: inline-block; padding: 15px 40px; border: 2px solid #071f29; color: #ff0000; text-decoration: none; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100px;}
+        .cart-float { position: fixed; top: 20px; right: 20px; background: #3affaa; color: black; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="page.html" class="cart-float">🛒 السلة (<span id="cartCount">0</span>)</a>
+    
+    <div class="welcome">
+        <h1>أهلاً بك في متجر الورق</h1>
+        <br><br>
+        <p class="Whatsapp">Whatsapp:+20 11 00623263</p>
+        <a href="papper.html" class="btn-order">ابدأ الطلب الآن</a>
+    </div>
+
+    <p><a class="c" href="controlpanel.html">ADMIN</a></p>
+
+    <script>
+        function updateCart() {
+            const cart = JSON.parse(localStorage.getItem('userCart')) || [];
+            document.getElementById('cartCount').innerText = cart.length;
+        }
+        updateCart();
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم والطباعة</title>
+    <style>
+        /* التنسيق العادي للوحة */
+        body { background: #0d1117; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .container { background: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; width: 98%; margin: auto; overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
+        th { background: #1f2937; color: #58a6ff; padding: 15px; }
+        .order-row td { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
+        /* الأزرار */
+        .btn { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 2px; }
+        .del-btn { background: #da3633; color: white; }
+        .edit-btn { background: #f2cc60; color: black; }
+        .print-btn { background: #3affaa; color: black; } /* زرار الطباعة */
+
+        /* إعدادات الطباعة - لا تظهر في المتصفح وتظهر فقط عند الطباعة */
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .container, #loginBox, .edit-btn, .del-btn, .print-btn, th:last-child, td:last-child { display: none !important; }
+            .print-area { display: block !important; direction: rtl; padding: 20px; border: 2px solid black; }
+            table { width: 100%; border-collapse: collapse; color: black; }
+            th, td { border: 1px solid black !important; color: black !important; background: white !important; }
+        }
+        .print-area { display: none; } /* مخفية في الوضع العادي */
+
+        /* المودال */
+        #editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #161b22; padding: 25px; border-radius: 10px; z-index: 1000; width: 320px; border: 1px solid #30363d; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+        .edit-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #30363d; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="loginBox">
+        <input type="password" id="pass" placeholder="كلمة السر" style="padding:10px; border-radius:5px;">
+        <button onclick="checkPass()" class="btn print-btn">دخول</button>
+    </div>
+
+    <div class="modal-overlay" id="overlay"></div>
+    <div id="editModal">
+        <h3>تعديل البيانات</h3>
+        <div class="edit-item"><span>الاسم</span><button onclick="updateField('customerName')">تعديل</button></div>
+        <div class="edit-item"><span>الموبايل</span><button onclick="updateField('customerPhone')">تعديل</button></div>
+        <div class="edit-item"><span>النوع</span><button onclick="updateCartItem('type')">تعديل</button></div>
+        <div class="edit-item"><span>المقاس</span><button onclick="updateCartItem('size')">تعديل</button></div>
+        <div class="edit-item"><span>العدد</span><button onclick="updateCartItem('qty')">تعديل</button></div>
+        <button onclick="closeModal()" style="background:#da3633; color:white; width:100%; margin-top:10px; border:none; padding:10px;">إغلاق</button>
+    </div>
+
+    <div id="panel" style="display:none;" class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>العميل</th>
+                    <th>الموبايل</th>
+                    <th>التفاصيل</th>
+                    <th>الإدارة</th>
+                </tr>
+            </thead>
+            <tbody id="tableRows"></tbody>
+        </table>
+    </div>
+
+    <div id="printSection" class="print-area"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+  import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKOL2J5tOU_z1_B_i9vPlf1qDteW85fc4",
+    databaseURL: "https://paper-90c73-default-rtdb.firebaseio.com",
+    projectId: "paper-90c73"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let currentOrderId = "";
+  let currentOrderData = {};
+  const colors = ["#1b4332", "#0d3b66", "#432818", "#3c096c", "#2d3142"];
+
+  window.checkPass = function() {
+    if(document.getElementById('pass').value === "123") {
+      document.getElementById('loginBox').style.display = "none";
+      document.getElementById('panel').style.display = "block";
+      startLoading();
+    } else { alert("خطأ!"); }
+  }
+
+  function startLoading() {
+    onValue(ref(db, 'orders'), (snapshot) => {
+      const tbody = document.getElementById('tableRows');
+      tbody.innerHTML = "";
+      const data = snapshot.val();
+      if(data) {
+        let i = 0;
+        for (let id in data) {
+          const order = data[id];
+          const bg = colors[i % colors.length]; i++;
+          let itemsText = order.orderItems ? order.orderItems.map(item => `${item.type} | ${item.size} | ${item.qty}`).join("<br>") : "";
+
+          tbody.innerHTML += `
+            <tr class="order-row" style="background:${bg}">
+              <td>${order.customerName}</td>
+              <td>${order.customerPhone}</td>
+              <td>${itemsText}</td>
+              <td>
+                <button class="btn print-btn" onclick='printOrder(${JSON.stringify(order)})'>طباعة</button>
+                <button class="btn edit-btn" onclick='openEditModal("${id}", ${JSON.stringify(order)})'>تعديل</button>
+                <button class="btn del-btn" onclick="deleteOrder('${id}')">حذف</button>
+              </td>
+            </tr>`;
+        }
+      }
+    });
+  }
+
+  // دالة الطباعة الاحترافية
+  window.printOrder = (order) => {
+    const printSection = document.getElementById('printSection');
+    let itemsHtml = order.orderItems.map(i => `<tr><td>${i.type}</td><td>${i.size}</td><td>${i.qty}</td></tr>`).join("");
+    
+    printSection.innerHTML = `
+        <div style="text-align:center; border:2px solid black; padding:20px; font-family:Arial;">
+            <h2 style="margin:0;">وصل استلام طلب ورق</h2>
+            <hr>
+            <p style="text-align:right;"><b>الاسم:</b> ${order.customerName}</p>
+            <p style="text-align:right;"><b>الموبايل:</b> ${order.customerPhone}</p>
+            <table border="1" style="width:100%; text-align:center; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#eee;">
+                        <th>النوع</th>
+                        <th>المقاس</th>
+                        <th>العدد</th>
+                    </tr>
+                </thead>
+                <tbody>${itemsHtml}</tbody>
+            </table>
+            <p style="margin-top:20px;">شكراً لتعاملكم معنا</p>
+        </div>
+    `;
+    window.print();
+  }
+
+  window.openEditModal = (id, data) => {
+    currentOrderId = id; currentOrderData = data;
+    document.getElementById('editModal').style.display = "block";
+    document.getElementById('overlay').style.display = "block";
+  }
+
+  window.closeModal = () => {
+    document.getElementById('editModal').style.display = "none";
+    document.getElementById('overlay').style.display = "none";
+  }
+
+  window.updateField = (field) => {
+    const val = prompt("القيمة الجديدة:", currentOrderData[field]);
+    if(val) {
+        let obj = {}; obj[field] = val;
+        update(ref(db, 'orders/' + currentOrderId), obj).then(() => closeModal());
+    }
+  }
+
+  window.updateCartItem = (sub) => {
+    const val = prompt("التعديل:", currentOrderData.orderItems[0][sub]);
+    if(val) {
+        let items = [...currentOrderData.orderItems];
+        items[0][sub] = val;
+        update(ref(db, 'orders/' + currentOrderId), { orderItems: items }).then(() => closeModal());
+    }
+  }
+
+  window.deleteOrder = (id) => { if(confirm("حذف؟")) remove(ref(db, 'orders/' + id)); }
+</script>
+</body>
+</html>

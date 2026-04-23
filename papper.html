@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>اختر نوع الورق</title>
+    <style>
+        body { background-color: rgb(0, 13, 17); color: white; font-family: sans-serif; text-align: center; }
+        .tools { list-style: none; padding: 30px 0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .tools a { display: inline-block; padding: 15px 40px; border: 2px solid #071f29; color: #3affaa; text-decoration: none; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; width: 250px; }
+        .tools a:hover { background: #3affaa; color: black; }
+        input { padding: 10px; border-radius: 8px; border: 1px solid #3affaa; background: #0d1117; color: white; width: 80px; text-align: center; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <h2>1. حدد الكمية واختار النوع</h2>
+    <input type="number" id="pQty" value="1" min="1">
+    
+    <ul class="tools">
+        <li><a onclick="nextStep('فرخ كامل')">فرخ كامل</a></li>
+        <li><a onclick="nextStep('فرخ كانسون 150 جرام')">فرخ كانسون 150 جرام</a></li>
+        <li><a onclick="nextStep('فرخ كانسون 250 جرام')">فرخ كانسون 250 جرام</a></li>
+        <li><a onclick="nextStep('فرخ كانسون 350 جرام')">فرخ كانسون 350 جرام</a></li>
+        <li><a onclick="nextStep('نصبيان اسود')">نصبيان اسود</a></li>
+        <li><a onclick="nextStep('نصبيان ابيض')">نصبيان ابيض</a></li>
+        <li><a onclick="nextStep('فرخ كالك')">فرخ كالك</a></li>
+        <li><a onclick="nextStep('فرخ كرافت')">فرخ كرافت</a></li>
+        <li><a onclick="nextStep('تمن')">تمن</a></li>
+    </ul>
+
+    <script>
+        function nextStep(type) {
+            localStorage.setItem('temp_type', type);
+            localStorage.setItem('temp_qty', document.getElementById('pQty').value);
+            window.location.href = 'types.html';
+        }
+    </script>
+</body>
+</html>
