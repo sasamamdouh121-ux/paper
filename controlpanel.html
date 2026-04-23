@@ -2,54 +2,68 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم Xcore - النسخة الكاملة</title>
+    <title>لوحة تحكم Xcore - نظام الطباعة والتسعير</title>
     <style>
         body { background: #0d1117; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
         .container { background: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; width: 98%; margin: auto; overflow-x: auto; }
         
-        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; min-width: 900px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; min-width: 1000px; }
         th { background: #1f2937; color: #58a6ff; padding: 15px; border-bottom: 2px solid #30363d; }
         
         .order-row td { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: middle; }
         
-        .btn { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 2px; }
+        .btn { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 2px; transition: 0.2s; }
         .del-btn { background: #da3633; color: white; }
         .edit-btn { background: #f2cc60; color: black; }
         .print-btn { background: #3affaa; color: black; }
+        .btn:hover { opacity: 0.8; transform: scale(1.05); }
 
+        /* ستايل الطباعة المعدل لرفع المحتوى */
         @media print {
             body * { visibility: hidden; background: white !important; }
             #printSection, #printSection * { visibility: visible; }
-            #printSection { position: absolute; left: 0; top: -10mm; width: 100%; display: block !important; }
+            #printSection { 
+                position: absolute; 
+                left: 0; 
+                top: -15mm; /* يرفع الوصل لفوق في الورقة */
+                width: 100%; 
+                display: block !important; 
+            }
             table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid black !important; color: black !important; padding: 8px; }
+            th, td { border: 1px solid black !important; color: black !important; padding: 8px; text-align: center; }
             @page { margin: 0; }
         }
         #printSection { display: none; }
 
+        /* المودال (نافذة التعديل) */
         #editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #161b22; padding: 25px; border-radius: 10px; z-index: 1000; width: 320px; border: 1px solid #30363d; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+        .modal-btn { width: 100%; margin-bottom: 8px; padding: 12px; font-size: 16px; }
     </style>
 </head>
 <body>
 
     <div id="loginBox">
-        <input type="password" id="pass" placeholder="كلمة السر" style="padding:10px; border-radius:5px;">
-        <button onclick="checkPass()" class="btn print-btn">دخول</button>
+        <input type="password" id="pass" placeholder="كلمة السر" style="padding:15px; border-radius:8px; border:1px solid #30363d; background:#161b22; color:white; width:250px;">
+        <br><br>
+        <button onclick="checkPass()" class="btn print-btn" style="padding:10px 40px;">دخول النظام</button>
     </div>
 
     <div class="modal-overlay" id="overlay"></div>
     <div id="editModal">
-        <h3>تعديل البيانات</h3>
-        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateField('customerName')">الاسم</button>
-        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateField('customerPhone')">الموبايل</button>
-        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateCartItem('type')">النوع</button>
-        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateCartItem('size')">المقاس</button>
-        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateCartItem('qty')">العدد</button>
-        <button onclick="closeModal()" style="background:#da3633; color:white; width:100%; margin-top:10px; border:none; padding:10px; border-radius:5px;">إغلاق</button>
+        <h3 style="margin-top:0; color:#58a6ff;">تعديل الطلب</h3>
+        <button class="btn edit-btn modal-btn" onclick="updateField('customerName')">تعديل الاسم</button>
+        <button class="btn edit-btn modal-btn" onclick="updateField('customerPhone')">تعديل الموبايل</button>
+        <hr style="border:0.5px solid #30363d; margin:15px 0;">
+        <button class="btn edit-btn modal-btn" onclick="updateCartItem('type')">تعديل النوع</button>
+        <button class="btn edit-btn modal-btn" onclick="updateCartItem('size')">تعديل المقاس</button>
+        <button class="btn edit-btn modal-btn" onclick="updateCartItem('qty')">تعديل العدد</button>
+        <button class="btn print-btn modal-btn" onclick="updateCartItem('price')">إضافة/تعديل السعر</button>
+        <button onclick="closeModal()" style="background:#444; color:white; width:100%; margin-top:10px; border:none; padding:10px; border-radius:5px; cursor:pointer;">إلغاء</button>
     </div>
 
     <div id="panel" style="display:none;" class="container">
+        <h2 style="color:#3affaa;">لوحة إدارة الطلبات</h2>
         <table>
             <thead>
                 <tr>
@@ -58,8 +72,8 @@
                     <th>النوع</th>
                     <th>المقاس</th>
                     <th>العدد</th>
-                    <th>الإدارة</th>
                     <th>السعر</th>
+                    <th>الإدارة</th>
                 </tr>
             </thead>
             <tbody id="tableRows"></tbody>
@@ -90,7 +104,7 @@
       document.getElementById('loginBox').style.display = "none";
       document.getElementById('panel').style.display = "block";
       startLoading();
-    } else { alert("خطأ!"); }
+    } else { alert("كلمة السر خطأ!"); }
   }
 
   function startLoading() {
@@ -104,7 +118,7 @@
           const order = data[id];
           const bg = colors[i % colors.length]; i++;
 
-          let allTypes = "", allSizes = "", allQtys = "";
+          let allTypes = "", allSizes = "", allQtys = "", allPrices = "";
 
           if (order.orderItems && Array.isArray(order.orderItems)) {
             order.orderItems.forEach((item, index) => {
@@ -112,6 +126,7 @@
                 allTypes += separator + item.type;
                 allSizes += separator + item.size;
                 allQtys += separator + item.qty;
+                allPrices += separator + (item.price || "---"); // عرض السعر أو شرطة لو فاضي
             });
           }
 
@@ -121,7 +136,8 @@
               <td>${order.customerPhone}</td>
               <td style="color:#3affaa;">${allTypes}</td>
               <td style="color:#f2cc60;">${allSizes}</td>
-              <td style="background:rgba(255,255,255,0.1); font-weight:bold;">${allQtys}</td>
+              <td style="font-weight:bold;">${allQtys}</td>
+              <td style="background:rgba(58,255,170,0.1); color:#3affaa; font-weight:bold;">${allPrices}</td>
               <td>
                 <button class="btn print-btn" onclick='printOrder(${JSON.stringify(order)})'>طباعة</button>
                 <button class="btn edit-btn" onclick='openEditModal("${id}", ${JSON.stringify(order)})'>تعديل</button>
@@ -135,20 +151,36 @@
 
   window.printOrder = (order) => {
     const printSection = document.getElementById('printSection');
-    let itemsHtml = order.orderItems.map(i => `<tr><td>${i.type}</td><td>${i.size}</td><td>${i.qty}</td></tr>`).join("");
+    // بناء صفوف الجدول في الطباعة مع خانة السعر
+    let itemsHtml = order.orderItems.map(i => `
+        <tr>
+            <td>${i.type}</td>
+            <td>${i.size}</td>
+            <td>${i.qty}</td>
+            <td>${i.price || ""}</td> 
+        </tr>`).join("");
     
     printSection.innerHTML = `
         <div style="direction:rtl; text-align:center; padding:20px; font-family:Arial; color:black;">
-            <h2>وصل طلبات ورق - Xcore</h2>
+            <h2 style="margin:0;">وصل استلام طلبات - Xcore</h2>
+            <p style="font-size:12px;">التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
             <hr>
-            <div style="text-align:right;">
+            <div style="text-align:right; margin-bottom:15px;">
                 <p><b>العميل:</b> ${order.customerName}</p>
                 <p><b>الموبايل:</b> ${order.customerPhone}</p>
             </div>
-            <table border="1" style="width:100%; border-collapse:collapse;">
-                <thead><tr style="background:#eee;"><th>النوع</th><th>المقاس</th><th>العدد</th></tr></thead>
+            <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+                <thead>
+                    <tr style="background:#f0f0f0;">
+                        <th>النوع</th>
+                        <th>المقاس</th>
+                        <th>العدد</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
                 <tbody>${itemsHtml}</tbody>
             </table>
+            <p style="margin-top:20px; font-size:14px;">شكراً لتعاملكم معنا</p>
         </div>
     `;
     window.print();
@@ -167,38 +199,23 @@
 
   window.updateField = (field) => {
     const val = prompt("القيمة الجديدة:", currentOrderData[field]);
-    if(val) {
+    if(val !== null) {
         let obj = {}; obj[field] = val;
         update(ref(db, 'orders/' + currentOrderId), obj).then(() => closeModal());
     }
   }
 
   window.updateCartItem = (sub) => {
-    const val = prompt("التعديل (سيتم تعديل الصنف الأول):", currentOrderData.orderItems[0][sub]);
-    if(val) {
+    // تعديل السعر أو البيانات لأول صنف في القائمة
+    const val = prompt(`إدخال ${sub === 'price' ? 'السعر' : 'التعديل'}:`, currentOrderData.orderItems[0][sub] || "");
+    if(val !== null) {
         let items = [...currentOrderData.orderItems];
         items[0][sub] = val;
         update(ref(db, 'orders/' + currentOrderId), { orderItems: items }).then(() => closeModal());
     }
   }
-    // جوه دالة startLoading وفي الجزء اللي بيبني الـ rows:
-let allPrices = ""; // تعريف متغير السعر
 
-if (order.orderItems && Array.isArray(order.orderItems)) {
-    order.orderItems.forEach((item, index) => {
-        let separator = index > 0 ? "<hr style='border:0.1px solid rgba(255,255,255,0.2); margin:5px 0;'>" : "";
-        allTypes += separator + item.type;
-        allSizes += separator + item.size;
-        allQtys += separator + item.qty;
-        // بنعرض السعر لو موجود لكل صنف، لو مش موجود بيبقى فاضي
-        allPrices += separator + (item.price || ""); 
-    });
-}
-
-// ضيف خانة السعر في الـ innerHTML بتاع الـ row:
-`<td>${allPrices}</td>`
-
-  window.deleteOrder = (id) => { if(confirm("حذف؟")) remove(ref(db, 'orders/' + id)); }
+  window.deleteOrder = (id) => { if(confirm("هل أنت متأكد من حذف هذا الطلب؟")) remove(ref(db, 'orders/' + id)); }
 </script>
 </body>
 </html>
