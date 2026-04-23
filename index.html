@@ -12,9 +12,6 @@
             text-align: center; 
             margin: 0; 
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
 
         /* تنسيق السلة */
@@ -29,90 +26,68 @@
             text-decoration: none; 
             font-weight: bold; 
             z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* القسم الترحيبي (تقليل الهوامش) */
-        .welcome { 
-            margin-top: 50px; /* تـعـديـل: تقليل الهامش العلوي */
-            flex: 1; /* بيخلي القسم ده ياخد باقي المساحة */
+        /* --- تـعـديـل: زرار الأدمن رجع فوق --- */
+        .admin-btn-top {
+            position: absolute;
+            top: 20px;
+            left: 20px; /* خليه على الشمال عشان السلة على اليمين */
+            padding: 8px 20px;
+            border: 1px solid #da3633;
+            color: #da3633;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.3s;
         }
+        .admin-btn-top:hover { background: #da3633; color: white; }
 
-        .welcome h1 { margin-bottom: 5px; } /* تـعـديـل */
+        .welcome { margin-top: 80px; }
 
-        .whatsapp-p { 
-            font-size: 14px; 
-            color: #ddd; 
-            margin: 0 auto 30px auto; /* تـعـديـل */
-        }
+        .whatsapp-p { font-size: 14px; color: #ddd; margin-bottom: 20px; }
 
         /* تنسيق الصورة (اللوجو) */
         .i {
             display: block;
-            max-width: 150px; /* تـعـديـل */
+            max-width: 150px; 
             height: auto;
-            margin: 0 auto -20px auto; /* تـعـديـل: تـحـريـك الـصـورة لـلأعـلـى لـتـكـون قـريـبـة */
+            margin: 0 auto 10px auto;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
         }
 
-        /* تنسيق زر الطلب (تحريكه للأعلى) */
+        /* زرار الطلب */
         .btn-order {   
-            margin-top: 50px; /* تـعـديـل: تـقـلـيـل الـمـسـافـة مـن 300px لـ 50px */
+            margin-top: 30px;
             display: inline-block; 
-            padding: 18px 45px; 
-            border: 2px solid #033646; 
-            background: #033646; /* تـعـديـل: خلفية أصلية */
-            color: white; /* تـعـديـل */
+            padding: 18px 50px; 
+            background: #033646;
+            color: white; 
             text-decoration: none; 
             border-radius: 50px; 
-            font-size: 22px; 
+            font-size: 24px; 
             font-weight: bold; 
-            transition: 0.3s ease; 
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn-order:hover { 
-            background: #04495e; 
-            transform: translateY(-3px); 
-            box-shadow: 0 8px 20px rgba(3,54,70,0.5);
-        }
-
-        /* تنسيق زر الأدمن (تحسين الشكل) */
-        .c-div { margin: 40px auto; padding-bottom: 20px; }
-        .c {
-            display: inline-block; 
-            padding: 10px 25px; 
-            border: 1px solid #da3633; 
-            color: #da3633; 
-            text-decoration: none; 
-            border-radius: 50px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            cursor: pointer; 
             transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(3,54,70,0.4);
         }
-        .c:hover{background: #da3633; color: white;}
+        .btn-order:hover { background: #04495e; transform: scale(1.05); }
     
     </style>
 </head>
 <body>
+    <a href="controlpanel.html" class="admin-btn-top">ADMIN</a>
+
     <a href="page.html" class="cart-float">🛒 السلة (<span id="cartCount">0</span>)</a>
     
     <div class="welcome">
         <h1>أهلاً بك في متجر الورق</h1>
-        <p class="whatsapp-p">Whatsapp: <span style="font-weight:bold;">+20 11 00623263</span></p>
+        <p class="whatsapp-p">Whatsapp: +20 11 00623263</p>
         
         <img class="i" src="IMG-20260420-WA0004.jpg" alt="Logo">
         
         <br>
-        
         <a href="papper.html" class="btn-order">ابدأ الطلب الآن</a>
-    </div>
-
-    <div class="c-div">
-        <a class="c" href="controlpanel.html"><i class="fas fa-lock"></i> ADMIN PANEL</a>
     </div>
 
     <script>
