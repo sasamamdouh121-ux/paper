@@ -181,6 +181,22 @@
         update(ref(db, 'orders/' + currentOrderId), { orderItems: items }).then(() => closeModal());
     }
   }
+    // جوه دالة startLoading وفي الجزء اللي بيبني الـ rows:
+let allPrices = ""; // تعريف متغير السعر
+
+if (order.orderItems && Array.isArray(order.orderItems)) {
+    order.orderItems.forEach((item, index) => {
+        let separator = index > 0 ? "<hr style='border:0.1px solid rgba(255,255,255,0.2); margin:5px 0;'>" : "";
+        allTypes += separator + item.type;
+        allSizes += separator + item.size;
+        allQtys += separator + item.qty;
+        // بنعرض السعر لو موجود لكل صنف، لو مش موجود بيبقى فاضي
+        allPrices += separator + (item.price || ""); 
+    });
+}
+
+// ضيف خانة السعر في الـ innerHTML بتاع الـ row:
+`<td>${allPrices}</td>`
 
   window.deleteOrder = (id) => { if(confirm("حذف؟")) remove(ref(db, 'orders/' + id)); }
 </script>
