@@ -2,18 +2,99 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر الورق - الرئيسية</title>
     <style>
-        .whatsapp{width: 50px; height: 50px;}
-        body { background-color: rgb(0, 13, 17); color: white; font-family: sans-serif; text-align: center; margin: 0; }
-        .nav { padding: 20px; background: #061e3f; }
-        .nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
-        .welcome { margin-top: 100px; }
-        .btn-order {   display: inline-block; padding: 20px 50px; border: 2px solid #033646; color: #032730; text-decoration: none; border-radius: 50px; font-size: 24px; font-weight: bold; transition: 0.3s; }
-        .btn-order:hover { background: #033646; color: white; }
-        .c:hover{background: #ff0000; color: black;}
-        .c{display: inline-block; padding: 15px 40px; border: 2px solid #071f29; color: #ff0000; text-decoration: none; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; width: 100px;}
-        .cart-float { position: fixed; top: 20px; right: 20px; background: #3affaa; color: black; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; }
+        body { 
+            background-color: rgb(0, 13, 17); 
+            color: white; 
+            font-family: sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* تنسيق السلة */
+        .cart-float { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: #3affaa; 
+            color: black; 
+            padding: 10px 20px; 
+            border-radius: 10px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* القسم الترحيبي (تقليل الهوامش) */
+        .welcome { 
+            margin-top: 50px; /* تـعـديـل: تقليل الهامش العلوي */
+            flex: 1; /* بيخلي القسم ده ياخد باقي المساحة */
+        }
+
+        .welcome h1 { margin-bottom: 5px; } /* تـعـديـل */
+
+        .whatsapp-p { 
+            font-size: 14px; 
+            color: #ddd; 
+            margin: 0 auto 30px auto; /* تـعـديـل */
+        }
+
+        /* تنسيق الصورة (اللوجو) */
+        .i {
+            display: block;
+            max-width: 150px; /* تـعـديـل */
+            height: auto;
+            margin: 0 auto -20px auto; /* تـعـديـل: تـحـريـك الـصـورة لـلأعـلـى لـتـكـون قـريـبـة */
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+        }
+
+        /* تنسيق زر الطلب (تحريكه للأعلى) */
+        .btn-order {   
+            margin-top: 50px; /* تـعـديـل: تـقـلـيـل الـمـسـافـة مـن 300px لـ 50px */
+            display: inline-block; 
+            padding: 18px 45px; 
+            border: 2px solid #033646; 
+            background: #033646; /* تـعـديـل: خلفية أصلية */
+            color: white; /* تـعـديـل */
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-size: 22px; 
+            font-weight: bold; 
+            transition: 0.3s ease; 
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-order:hover { 
+            background: #04495e; 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 20px rgba(3,54,70,0.5);
+        }
+
+        /* تنسيق زر الأدمن (تحسين الشكل) */
+        .c-div { margin: 40px auto; padding-bottom: 20px; }
+        .c {
+            display: inline-block; 
+            padding: 10px 25px; 
+            border: 1px solid #da3633; 
+            color: #da3633; 
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .c:hover{background: #da3633; color: white;}
+    
     </style>
 </head>
 <body>
@@ -21,12 +102,18 @@
     
     <div class="welcome">
         <h1>أهلاً بك في متجر الورق</h1>
-        <br><br>
-        <p class="Whatsapp">Whatsapp:+20 11 00623263</p>
+        <p class="whatsapp-p">Whatsapp: <span style="font-weight:bold;">+20 11 00623263</span></p>
+        
+        <img class="i" src="IMG-20260420-WA0004.jpg" alt="Logo">
+        
+        <br>
+        
         <a href="papper.html" class="btn-order">ابدأ الطلب الآن</a>
     </div>
 
-    <p><a class="c" href="controlpanel.html">ADMIN</a></p>
+    <div class="c-div">
+        <a class="c" href="controlpanel.html"><i class="fas fa-lock"></i> ADMIN PANEL</a>
+    </div>
 
     <script>
         function updateCart() {
