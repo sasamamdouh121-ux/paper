@@ -2,35 +2,53 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم والطباعة</title>
+    <title>Xcore - نظام الطباعة المباشر</title>
     <style>
-        /* التنسيق العادي للوحة */
+        /* التنسيق العادي للوحة التحكم (الظاهر على الشاشة) */
         body { background: #0d1117; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
         .container { background: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; width: 98%; margin: auto; overflow-x: auto; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; min-width: 800px; }
         th { background: #1f2937; color: #58a6ff; padding: 15px; }
         .order-row td { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
         
-        /* الأزرار */
         .btn { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 2px; }
         .del-btn { background: #da3633; color: white; }
         .edit-btn { background: #f2cc60; color: black; }
-        .print-btn { background: #3affaa; color: black; } /* زرار الطباعة */
+        .print-btn { background: #3affaa; color: black; }
 
-        /* إعدادات الطباعة - لا تظهر في المتصفح وتظهر فقط عند الطباعة */
+        /* منطقة الريسيت (مخفية تماماً على الشاشة) */
+        #printSection { display: none; }
+
+        /* ====================================================== */
+        /* ستايل الطباعة (ده اللي البرنتر بتشوفه بس) */
+        /* ====================================================== */
         @media print {
-            body { background: white; color: black; padding: 0; }
-            .container, #loginBox, .edit-btn, .del-btn, .print-btn, th:last-child, td:last-child { display: none !important; }
-            .print-area { display: block !important; direction: rtl; padding: 20px; border: 2px solid black; }
-            table { width: 100%; border-collapse: collapse; color: black; }
-            th, td { border: 1px solid black !important; color: black !important; background: white !important; }
+            /* 1. إخفاء كل عناصر الموقع */
+            body * { visibility: hidden; background: white !important; }
+            
+            /* 2. إظهار منطقة الريسيت فقط وتثبيتها في أعلى الصفحة */
+            #printSection, #printSection * { visibility: visible; }
+            #printSection { 
+                display: block !important; 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                color: black !important;
+                padding: 10px;
+            }
+
+            /* 3. تنسيق الجدول داخل الريسيت */
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            .print-table th, .print-table td { border: 1px solid black !important; padding: 8px; text-align: center; color: black !important; }
+            
+            /* إخفاء أي هوامش تطلع من المتصفح */
+            @page { margin: 0; }
         }
-        .print-area { display: none; } /* مخفية في الوضع العادي */
 
         /* المودال */
         #editModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #161b22; padding: 25px; border-radius: 10px; z-index: 1000; width: 320px; border: 1px solid #30363d; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
-        .edit-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #30363d; padding-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -43,12 +61,12 @@
     <div class="modal-overlay" id="overlay"></div>
     <div id="editModal">
         <h3>تعديل البيانات</h3>
-        <div class="edit-item"><span>الاسم</span><button onclick="updateField('customerName')">تعديل</button></div>
-        <div class="edit-item"><span>الموبايل</span><button onclick="updateField('customerPhone')">تعديل</button></div>
-        <div class="edit-item"><span>النوع</span><button onclick="updateCartItem('type')">تعديل</button></div>
-        <div class="edit-item"><span>المقاس</span><button onclick="updateCartItem('size')">تعديل</button></div>
-        <div class="edit-item"><span>العدد</span><button onclick="updateCartItem('qty')">تعديل</button></div>
-        <button onclick="closeModal()" style="background:#da3633; color:white; width:100%; margin-top:10px; border:none; padding:10px;">إغلاق</button>
+        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateField('customerName')">الاسم</button>
+        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateField('customerPhone')">الموبايل</button>
+        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateCartItem('type')">النوع</button>
+        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateCartItem('size')">المقاس</button>
+        <button class="btn edit-btn" style="width:100%; margin-bottom:5px;" onclick="updateCartItem('qty')">العدد</button>
+        <button onclick="closeModal()" style="background:#da3633; color:white; width:100%; margin-top:10px; border:none; padding:10px; border-radius:5px;">إغلاق</button>
     </div>
 
     <div id="panel" style="display:none;" class="container">
@@ -57,7 +75,9 @@
                 <tr>
                     <th>العميل</th>
                     <th>الموبايل</th>
-                    <th>التفاصيل</th>
+                    <th>النوع</th>
+                    <th>المقاس</th>
+                    <th>العدد</th>
                     <th>الإدارة</th>
                 </tr>
             </thead>
@@ -65,7 +85,7 @@
         </table>
     </div>
 
-    <div id="printSection" class="print-area"></div>
+    <div id="printSection"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
@@ -102,15 +122,17 @@
         for (let id in data) {
           const order = data[id];
           const bg = colors[i % colors.length]; i++;
-          let itemsText = order.orderItems ? order.orderItems.map(item => `${item.type} | ${item.size} | ${item.qty}`).join("<br>") : "";
+          const item = order.orderItems ? order.orderItems[0] : {type:"-", size:"-", qty:"-"};
 
           tbody.innerHTML += `
             <tr class="order-row" style="background:${bg}">
-              <td>${order.customerName}</td>
+              <td><b>${order.customerName}</b></td>
               <td>${order.customerPhone}</td>
-              <td>${itemsText}</td>
+              <td>${item.type}</td>
+              <td>${item.size}</td>
+              <td>${item.qty}</td>
               <td>
-                <button class="btn print-btn" onclick='printOrder(${JSON.stringify(order)})'>طباعة</button>
+                <button class="btn print-btn" onclick='printToPrinter(${JSON.stringify(order)})'>طباعة فوري</button>
                 <button class="btn edit-btn" onclick='openEditModal("${id}", ${JSON.stringify(order)})'>تعديل</button>
                 <button class="btn del-btn" onclick="deleteOrder('${id}')">حذف</button>
               </td>
@@ -120,30 +142,32 @@
     });
   }
 
-  // دالة الطباعة الاحترافية
-  window.printOrder = (order) => {
+  window.printToPrinter = (order) => {
     const printSection = document.getElementById('printSection');
-    let itemsHtml = order.orderItems.map(i => `<tr><td>${i.type}</td><td>${i.size}</td><td>${i.qty}</td></tr>`).join("");
+    const itemsHtml = order.orderItems.map(i => `<tr><td>${i.type}</td><td>${i.size}</td><td>${i.qty}</td></tr>`).join("");
     
+    // بناء محتوى الريسيت للبرنتر
     printSection.innerHTML = `
-        <div style="text-align:center; border:2px solid black; padding:20px; font-family:Arial;">
-            <h2 style="margin:0;">وصل استلام طلب ورق</h2>
-            <hr>
-            <p style="text-align:right;"><b>الاسم:</b> ${order.customerName}</p>
-            <p style="text-align:right;"><b>الموبايل:</b> ${order.customerPhone}</p>
-            <table border="1" style="width:100%; text-align:center; border-collapse:collapse;">
+        <div style="direction:rtl; text-align:center;">
+            <h2 style="margin:5px 0;">Xcore Paper Receipts</h2>
+            <p style="font-size:14px;">إيصال استلام طلب</p>
+            <hr style="border: 0.5px dashed black;">
+            <div style="text-align:right; font-size:14px;">
+                <p><b>العميل:</b> ${order.customerName}</p>
+                <p><b>الموبايل:</b> ${order.customerPhone}</p>
+                <p><b>التاريخ:</b> ${new Date().toLocaleString('ar-EG')}</p>
+            </div>
+            <table class="print-table">
                 <thead>
-                    <tr style="background:#eee;">
-                        <th>النوع</th>
-                        <th>المقاس</th>
-                        <th>العدد</th>
-                    </tr>
+                    <tr style="background:#f0f0f0;"><th>النوع</th><th>المقاس</th><th>العدد</th></tr>
                 </thead>
                 <tbody>${itemsHtml}</tbody>
             </table>
-            <p style="margin-top:20px;">شكراً لتعاملكم معنا</p>
+            <p style="margin-top:15px; font-size:12px;">نظام Xcore - شكراً لتعاملكم معنا</p>
         </div>
     `;
+
+    // الأمر السحري لتشغيل البرنتر
     window.print();
   }
 
@@ -159,7 +183,7 @@
   }
 
   window.updateField = (field) => {
-    const val = prompt("القيمة الجديدة:", currentOrderData[field]);
+    const val = prompt("تعديل " + field, currentOrderData[field]);
     if(val) {
         let obj = {}; obj[field] = val;
         update(ref(db, 'orders/' + currentOrderId), obj).then(() => closeModal());
@@ -167,7 +191,7 @@
   }
 
   window.updateCartItem = (sub) => {
-    const val = prompt("التعديل:", currentOrderData.orderItems[0][sub]);
+    const val = prompt("تعديل " + sub, currentOrderData.orderItems[0][sub]);
     if(val) {
         let items = [...currentOrderData.orderItems];
         items[0][sub] = val;
